@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Constrain viewport and prevent page-level panning; allow scrolling inside main */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevent horizontal panning */
+}
+
+/* Subtle page background so empty areas feel intentional */
+body {
+  background-color: #f8fafc; /* tailwind gray-50 */
+  overflow-y: auto; /* restore vertical scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Allow scrolling inside the main content when needed */
+main {
+  overflow: auto;
+}
