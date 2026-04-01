@@ -4,7 +4,9 @@ import API from "../api/axios";
 const Transactions = () => {
 
   const [transactions, setTransactions] = useState([]);
+  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search,setSearch] = useState("");
 
 
   const getTransactions = async () => {
@@ -14,6 +16,7 @@ const Transactions = () => {
       const res = await API.get("/transaction");
 
       setTransactions(res.data);
+      setFiltered(res.data);
 
     }
     catch (error) {
@@ -37,154 +40,355 @@ const Transactions = () => {
   }, []);
 
 
+  useEffect(()=>{
+
+    const result = transactions.filter((t)=>{
+
+      const from =
+        t.fromAccount?.user?.name?.toLowerCase() || "";
+
+      const to =
+        t.toAccount?.user?.name?.toLowerCase() || "";
+
+      return (
+        from.includes(search.toLowerCase())
+        ||
+        to.includes(search.toLowerCase())
+      );
+
+    });
+
+    setFiltered(result);
+
+  },[search,transactions]);
+
+
 
   return (
 
-    <div className="pt-24 ml-0 md:ml-56 px-4 md:px-8 flex justify-center">
+    <div
 
-      <div className="w-full max-w-2xl">
+      className="
+
+      pt-24
+
+      ml-0
+      md:ml-60
+
+      px-6
+
+      pb-10
+
+      bg-gray-50
+      dark:bg-gray-900
+
+      min-h-screen
+
+      "
+
+    >
 
 
-        {/* TITLE */}
-        <h1 className="text-xl md:text-2xl font-semibold mb-6 text-center">
+      <h1 className="text-2xl font-bold mb-6">
 
-          Transaction History
+        Transactions
 
-        </h1>
-
+      </h1>
 
 
-        {/* LOADING */}
+
+      {/* search */}
+
+      <div className="mb-4">
+
+        <input
+
+          placeholder="Search by name..."
+
+          value={search}
+
+          onChange={(e)=>setSearch(e.target.value)}
+
+          className="
+
+          border
+
+          px-4
+          py-2
+
+          rounded-lg
+
+          text-sm
+
+          w-full
+          md:w-72
+
+          outline-none
+
+          focus:ring-2
+          focus:ring-blue-500
+
+          bg-white
+          dark:bg-gray-800
+
+          dark:text-white
+
+          border-gray-300
+          dark:border-gray-600
+
+          "
+
+        />
+
+      </div>
+
+
+
+
+      {/* table */}
+
+      <div
+
+        className="
+
+        bg-white
+        dark:bg-gray-800
+
+        rounded-xl
+
+        shadow
+        dark:shadow-lg
+
+        p-6
+
+        "
+
+      >
+
         {
-          loading && (
 
-            <p className="text-sm text-gray-500 text-center">
+          loading
 
-              Loading transactions...
+          ?
 
-            </p>
+          <p className="text-gray-500 dark:text-gray-400">
 
-          )
-        }
+            Loading...
 
+          </p>
 
+          :
 
-        {/* LIST */}
-        <div className="flex flex-col gap-3">
+          filtered.length === 0
 
+          ?
 
-          {
-            !loading && transactions.length === 0 && (
+          <p className="text-gray-500 dark:text-gray-400">
 
-              <p className="text-sm text-gray-500 text-center">
+            No transactions found
 
-                No transactions yet
+          </p>
 
-              </p>
+          :
 
-            )
-          }
+          <table className="w-full text-sm">
 
+            <thead>
 
-
-          {
-            transactions.map((t) => (
-
-              <div
-                key={t._id}
+              <tr
 
                 className="
 
-                bg-white
+                text-gray-500
+                dark:text-gray-400
 
-                shadow
-
-                rounded-lg
-
-                p-4
-
-                flex
-
-                justify-between
-
-                items-center
-
-                text-sm
+                border-b
+                dark:border-gray-700
 
                 "
+
               >
 
+                <th className="text-left py-3">
 
-                {/* LEFT */}
-                <div>
+                  From
 
-                  <p className="text-gray-500">
+                </th>
 
-                    From
+                <th className="text-left py-3">
 
-                  </p>
+                  To
 
+                </th>
 
-                  <p className="font-medium">
+                <th className="text-left py-3">
 
-                    {
-                      t.fromAccount?.user?.name
-                      || "System"
-                    }
+                  Amount
 
-                  </p>
+                </th>
 
+                <th className="text-left py-3">
 
+                  Date
 
-                  <p className="text-gray-500 mt-2">
+                </th>
 
-                    To
+                <th className="text-left py-3">
 
-                  </p>
+                  Status
 
+                </th>
 
-                  <p className="font-medium">
+              </tr>
 
-                    {
-                      t.toAccount?.user?.name
-                      || "Unknown"
-                    }
-
-                  </p>
-
-
-                </div>
+            </thead>
 
 
 
-                {/* RIGHT */}
-                <div
-                  className="
+            <tbody>
 
-                  font-semibold
+              {
 
-                  text-base
+                filtered.map((t)=>(
 
-                  text-blue-600
+                  <tr
 
-                  "
-                >
+                    key={t._id}
 
-                  ₹ {t.amount}
+                    className="
 
-                </div>
+                    border-b
+                    dark:border-gray-700
+
+                    hover:bg-gray-50
+                    dark:hover:bg-gray-700
+
+                    transition
+
+                    "
+
+                  >
 
 
-              </div>
 
-            ))
-          }
+                    <td className="py-3">
+
+                      {
+
+                        t.fromAccount?.user?.name
+
+                        || "System"
+
+                      }
+
+                    </td>
 
 
-        </div>
 
+                    <td className="py-3">
+
+                      {
+
+                        t.toAccount?.user?.name
+
+                        || "Unknown"
+
+                      }
+
+                    </td>
+
+
+
+                    <td
+
+                      className={`
+
+                      py-3
+
+                      font-semibold
+
+                      ${
+
+                        t.fromAccount
+
+                        ? "text-red-500"
+
+                        : "text-green-500"
+
+                      }
+
+                      `}
+
+                    >
+
+                      ₹ {t.amount}
+
+                    </td>
+
+
+
+                    <td className="py-3 text-gray-500 dark:text-gray-400">
+
+                      {
+
+                        new Date(t.createdAt)
+
+                        .toLocaleDateString()
+
+                      }
+
+                    </td>
+
+
+
+                    <td className="py-3">
+
+                      <span
+
+                        className="
+
+                        px-3
+
+                        py-1
+
+                        rounded-full
+
+                        text-xs
+
+                        bg-green-100
+
+                        text-green-600
+
+                        dark:bg-green-900
+
+                        dark:text-green-300
+
+                        "
+
+                      >
+
+                        Success
+
+                      </span>
+
+                    </td>
+
+
+
+                  </tr>
+
+                ))
+
+              }
+
+            </tbody>
+
+          </table>
+
+        }
 
       </div>
+
 
 
     </div>

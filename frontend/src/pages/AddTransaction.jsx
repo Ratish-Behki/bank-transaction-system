@@ -3,42 +3,42 @@ import API from "../api/axios";
 
 const AddTransaction = () => {
 
-  const [amount,setAmount] = useState("");
+  const [amount, setAmount] = useState("");
 
-  const [fromAccount,setFromAccount] = useState("");
+  const [fromAccount, setFromAccount] = useState("");
 
-  const [toAccount,setToAccount] = useState("");
+  const [email, setEmail] = useState("");   // NEW
 
-  const [balance,setBalance] = useState(null);
+  const [toAccount, setToAccount] = useState("");  // auto filled
 
-  const [loading,setLoading] = useState(true);
+  const [receiver, setReceiver] = useState(null);  // show receiver info
 
-  const [checking,setChecking] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [checking, setChecking] = useState(false);
 
 
 
-  // get logged in account
+  // get logged-in user account
   const getAccount = async () => {
 
-    try{
+    try {
 
       const res = await API.get("/accounts");
 
-      if(res.data.accounts?.length){
+      if (res.data.accounts?.length) {
 
-        setFromAccount(
-          res.data.accounts[0]._id
-        );
+        setFromAccount(res.data.accounts[0]._id);
 
       }
 
     }
-    catch(error){
+    catch (error) {
 
       console.log(error);
 
     }
-    finally{
+    finally {
 
       setLoading(false);
 
@@ -47,48 +47,50 @@ const AddTransaction = () => {
   };
 
 
-  useEffect(()=>{
+  useEffect(() => {
 
     getAccount();
 
-  },[]);
+  }, []);
 
 
 
-  // check balance by id
-  const checkBalance = async () => {
+  // find account using email
+  const findReceiver = async () => {
 
-    if(!toAccount){
+    if (!email) {
 
-      alert("Enter account id");
+      alert("Enter email");
 
       return;
 
     }
 
-    try{
+    try {
 
       setChecking(true);
 
       const res = await API.get(
 
-        `/accounts/balance/${toAccount}`
+        `/accounts/find-by-email?email=${email}`
 
       );
 
-      setBalance(
-        res.data.balance.balance
-      );
+      setReceiver(res.data);
+
+      setToAccount(res.data._id);   // auto set account id
 
     }
-    catch(error){
+    catch (error) {
 
-      console.log(error);
+      setReceiver(null);
 
-      alert("Account not found");
+      setToAccount("");
+
+      alert("User not found");
 
     }
-    finally{
+    finally {
 
       setChecking(false);
 
@@ -98,30 +100,27 @@ const AddTransaction = () => {
 
 
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
+    if (!toAccount) {
 
-    if(!toAccount){
-
-      alert("Enter receiver account id");
-
-      return;
-
-    }
-
-
-    if(fromAccount === toAccount){
-
-      alert("Cannot send to same account");
+      alert("Enter valid email");
 
       return;
 
     }
 
+    if (fromAccount === toAccount) {
 
-    try{
+      alert("Cannot send to yourself");
+
+      return;
+
+    }
+
+    try {
 
       await API.post(
 
@@ -130,29 +129,35 @@ const AddTransaction = () => {
         {
 
           fromAccount,
-          toAccount,
 
-          amount:Number(amount),
+          toAccount,   // already fetched from email
+
+          amount: Number(amount),
 
           idempotencyKey:
-          Date.now().toString()
+            Date.now().toString()
 
         }
 
       );
 
-      alert("Transaction successful");
+      alert("Transfer successful");
 
       setAmount("");
 
+      setEmail("");
+
+      setReceiver(null);
+
+      setToAccount("");
+
     }
-    catch(error){
+    catch (error) {
 
       alert(
 
         error.response?.data?.message
-
-        || "Transaction failed"
+        || "Transfer failed"
 
       );
 
@@ -162,14 +167,62 @@ const AddTransaction = () => {
 
 
 
-  return(
+  return (
 
-    <div className="pt-24 ml-0 md:ml-56 px-4 md:px-8 flex justify-center">
+    <div
 
-      <div className="bg-white shadow rounded-lg p-6 md:p-8 w-full max-w-md">
+      className="
 
+      pt-24
+      pb-10
 
-        <h1 className="text-lg md:text-xl font-semibold mb-6 text-center">
+      bg-gray-50
+      dark:bg-gray-900
+
+      min-h-screen
+
+      flex
+      justify-center
+
+      "
+
+    >
+
+      <div
+
+        className="
+
+        bg-white
+        dark:bg-gray-800
+
+        shadow-xl
+
+        rounded-2xl
+
+        p-8
+
+        w-full
+        max-w-md
+
+        "
+
+      >
+
+        <h1
+
+          className="
+
+          text-2xl
+
+          font-bold
+
+          mb-6
+
+          text-center
+
+          "
+
+        >
 
           Transfer Money
 
@@ -178,158 +231,263 @@ const AddTransaction = () => {
 
 
         {
+
           loading
 
-          ?
+            ?
 
-          <p className="text-center text-gray-500 text-sm">
+            <p className="text-center">
 
-            Loading...
+              Loading...
 
-          </p>
+            </p>
 
-          :
+            :
 
-          <form
-           onSubmit={handleSubmit}
-           className="flex flex-col gap-4"
-          >
+            <form
 
+              onSubmit={handleSubmit}
 
-            {/* receiver id */}
-            <div>
+              className="flex flex-col gap-5"
 
-              <label className="text-sm">
-
-                Receiver Account ID
-
-              </label>
-
-
-              <input
-                placeholder="Enter account id"
-
-                value={toAccount}
-
-                onChange={(e)=>setToAccount(e.target.value)}
-
-                className="w-full mt-1 border rounded p-3 text-sm"
-
-                required
-              />
-
-            </div>
-
-
-
-            {/* check balance */}
-            <button
-              type="button"
-
-              onClick={checkBalance}
-
-              className="
-
-              bg-gray-200
-
-              p-2
-
-              rounded
-
-              text-sm
-
-              hover:bg-gray-300
-
-              "
             >
 
-              {checking
-               ? "Checking..."
-               : "Check Balance"}
-
-            </button>
 
 
+              {/* email */}
 
-            {/* show balance */}
-            {
-              balance !== null && (
+              <div>
 
-                <p className="text-sm text-green-600">
+                <label className="text-sm font-medium">
 
-                  Current Balance:
+                  Receiver Email
 
-                  ₹ {balance}
-
-                </p>
-
-              )
-            }
+                </label>
 
 
 
-            {/* amount */}
-            <div>
+                <input
 
-              <label className="text-sm">
+                  type="email"
 
-                Amount
+                  placeholder="Enter email"
 
-              </label>
+                  value={email}
 
+                  onChange={(e)=>setEmail(e.target.value)}
 
-              <input
-                type="number"
+                  required
 
-                placeholder="Enter amount"
+                  className="
 
-                value={amount}
+                  w-full
 
-                onChange={(e)=>setAmount(e.target.value)}
+                  mt-1
 
-                className="w-full mt-1 border rounded p-3 text-sm"
+                  border
 
-                required
-              />
+                  rounded-lg
 
-            </div>
+                  p-3
 
+                  text-sm
 
+                  bg-white
+                  dark:bg-gray-700
 
-            <button
-              className="
+                  dark:text-white
 
-              bg-blue-600
+                  border-gray-300
+                  dark:border-gray-600
 
-              text-white
+                  "
 
-              p-3
+                />
 
-              rounded
-
-              text-sm
-
-              hover:bg-blue-700
-
-              "
-            >
-
-              Send Money
-
-            </button>
+              </div>
 
 
-          </form>
+
+              {/* verify */}
+
+              <button
+
+                type="button"
+
+                onClick={findReceiver}
+
+                className="
+
+                bg-gray-100
+                dark:bg-gray-700
+
+                p-2
+
+                rounded-lg
+
+                text-sm
+
+                "
+
+              >
+
+                {
+
+                  checking
+                    ? "Checking..."
+                    : "Verify Email"
+
+                }
+
+              </button>
+
+
+
+              {/* receiver info */}
+
+              {
+
+                receiver && (
+
+                  <div
+
+                    className="
+
+                    bg-green-50
+                    dark:bg-green-900
+
+                    text-green-600
+                    dark:text-green-300
+
+                    p-3
+
+                    rounded-lg
+
+                    text-sm
+
+                    "
+
+                  >
+
+                    Receiver:
+
+                    <strong>
+
+                      {receiver.name}
+
+                    </strong>
+
+                    <br/>
+
+                    {receiver.email}
+
+                  </div>
+
+                )
+
+              }
+
+
+
+              {/* amount */}
+
+              <div>
+
+                <label className="text-sm font-medium">
+
+                  Amount
+
+                </label>
+
+
+
+                <input
+
+                  type="number"
+
+                  placeholder="Enter amount"
+
+                  value={amount}
+
+                  onChange={(e)=>setAmount(e.target.value)}
+
+                  required
+
+                  className="
+
+                  w-full
+
+                  mt-1
+
+                  border
+
+                  rounded-lg
+
+                  p-3
+
+                  text-sm
+
+                  bg-white
+                  dark:bg-gray-700
+
+                  dark:text-white
+
+                  border-gray-300
+                  dark:border-gray-600
+
+                  "
+
+                />
+
+              </div>
+
+
+
+              <button
+
+                className="
+
+                bg-gradient-to-r
+
+                from-blue-600
+                to-indigo-600
+
+                text-white
+
+                p-3
+
+                rounded-lg
+
+                text-sm
+
+                font-medium
+
+                "
+
+              >
+
+                Send Money
+
+              </button>
+
+
+
+            </form>
 
         }
 
 
+
       </div>
+
+
 
     </div>
 
   );
 
 };
+
+
 
 export default AddTransaction;

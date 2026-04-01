@@ -9,4 +9,7 @@ router.post('/', authMiddleware, accountController.createAccountController);
 router.get("/",authMiddleware,accountController.getUserAccountController)
 
 router.get("/balance/:accountId",authMiddleware,accountController.getAccountBalanceController)
+
+router.get("/find-by-email",authMiddleware,accountController.findAccountByEmail);
+
 module.exports = router;

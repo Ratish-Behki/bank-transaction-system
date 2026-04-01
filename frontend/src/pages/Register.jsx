@@ -1,6 +1,7 @@
 import { useState } from "react";
 import API from "../api/axios";
 import { useNavigate, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Register = () => {
 
@@ -8,51 +9,67 @@ const Register = () => {
 
   const [formData, setFormData] = useState({
 
-    name:"",
-    email:"",
-    password:""
+    name: "",
+    email: "",
+    password: ""
 
   });
 
 
-  const handleChange = (e)=>{
+  const handleChange = (e) => {
 
     setFormData({
 
       ...formData,
-
-      [e.target.name]:e.target.value
+      [e.target.name]: e.target.value
 
     });
 
   };
 
 
-  const handleSubmit = async (e)=>{
+  const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    try{
+    try {
 
       await API.post(
-
         "/auth/register",
-
         formData
-
       );
 
-      alert("Account created successfully");
+
+      await API.post(
+        "/auth/login",
+        {
+          email: formData.email,
+          password: formData.password
+        },
+        { withCredentials: true }
+      );
+
+
+      await API.post(
+        "/accounts",
+        {
+          accountType: "savings",
+          balance: 0
+        },
+        { withCredentials: true }
+      );
+
+
+      toast.success("Bank account created successfully 🎉");
 
       navigate("/");
 
     }
-    catch(error){
+    catch (error) {
 
-      alert(
+      toast.error(
 
         error.response?.data?.message
-
         || "Registration failed"
 
       );
@@ -63,281 +80,376 @@ const Register = () => {
 
 
 
-return(
+  return (
 
-<div className="min-h-screen flex flex-col bg-gray-50">
+    <div
 
+      className="
 
-{/* HEADER */}
-<div className="bg-blue-900 text-white">
+      min-h-screen
 
-<div className="
-flex flex-col items-center text-center
+      flex
+      flex-col
 
-py-6
-md:py-10">
+      bg-gray-50
+      dark:bg-gray-900
 
+      text-gray-900
+      dark:text-gray-100
 
-<h1 className="
-text-lg
-md:text-2xl
-font-bold">
+      "
 
-Bank Transaction System
+    >
 
-</h1>
 
+      {/* HEADER */}
 
-<p className="
-text-xs
-md:text-sm
-opacity-80">
+      <div
 
-Create your secure banking account
+        className="
 
-</p>
+        bg-blue-900
+        dark:bg-gray-800
 
+        text-white
 
-</div>
+        "
 
-</div>
+      >
 
+        <div className="flex flex-col items-center text-center py-6 md:py-10">
 
-<div className="h-1 bg-yellow-500"></div>
+          <div className="text-3xl mb-2">
+            🏦
+          </div>
 
+          <h1 className="text-lg md:text-2xl font-bold">
 
+            Open Your Bank Account
 
+          </h1>
 
-{/* REGISTER CARD */}
-<div className="
-flex-1
 
-flex items-center justify-center
+          <p className="text-xs md:text-sm opacity-80">
 
-p-4">
+            Secure online account opening process
 
+          </p>
 
-<div className="
-bg-white
+        </div>
 
-shadow
-rounded
+      </div>
 
-p-6
-md:p-10
 
-w-full
-max-w-md">
+      <div className="h-1 bg-yellow-500"></div>
 
 
-<h2 className="
-text-xl
-md:text-2xl
 
-font-semibold
+      {/* REGISTER CARD */}
 
-mb-6
+      <div className="flex-1 flex items-center justify-center p-4">
 
-text-center">
+        <div
 
-Create Account
+          className="
 
-</h2>
+          bg-white
+          dark:bg-gray-800
 
+          shadow
+          dark:shadow-lg
 
+          rounded
 
-<form
-onSubmit={handleSubmit}
+          p-6
+          md:p-10
 
-className="
-space-y-4">
+          w-full
+          max-w-md
 
+          "
 
-{/* NAME */}
-<div>
+        >
 
-<label className="
-text-sm
-font-medium">
 
-Full Name
+          <div className="text-center mb-6">
 
-</label>
+            <h2 className="text-xl md:text-2xl font-semibold">
 
+              Create New Account
 
-<input
-name="name"
-value={formData.name}
-onChange={handleChange}
+            </h2>
 
-placeholder="Enter your name"
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
 
-className="
-w-full
-mt-1
+              🔒 Your information is protected with bank-level security
 
-border
-rounded
+            </p>
 
-p-3
+          </div>
 
-text-sm"
-/>
 
-</div>
 
+          <form onSubmit={handleSubmit} className="space-y-4">
 
 
-{/* EMAIL */}
-<div>
+            {/* NAME */}
 
-<label className="
-text-sm
-font-medium">
+            <div>
 
-Email
+              <label className="text-sm font-medium">
 
-</label>
+                Account Holder Name
 
+              </label>
 
-<input
-name="email"
-value={formData.email}
-onChange={handleChange}
 
-placeholder="Enter email"
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Enter full name as per ID"
+                required
 
-className="
-w-full
-mt-1
+                className="
 
-border
-rounded
+                w-full
 
-p-3
+                mt-1
 
-text-sm"
-/>
+                border
 
-</div>
+                rounded
 
+                p-3
 
+                text-sm
 
-{/* PASSWORD */}
-<div>
+                bg-white
+                dark:bg-gray-700
 
-<label className="
-text-sm
-font-medium">
+                dark:text-white
 
-Password
+                border-gray-300
+                dark:border-gray-600
 
-</label>
+                "
 
+              />
 
-<input
-type="password"
+            </div>
 
-name="password"
 
-value={formData.password}
 
-onChange={handleChange}
+            {/* EMAIL */}
 
-placeholder="Create password"
+            <div>
 
-className="
-w-full
-mt-1
+              <label className="text-sm font-medium">
 
-border
-rounded
+                Registered Email
 
-p-3
+              </label>
 
-text-sm"
-/>
 
-</div>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter active email"
+                required
 
+                className="
 
+                w-full
 
-<button
-type="submit"
+                mt-1
 
-className="
-w-full
+                border
 
-bg-green-600
-text-white
+                rounded
 
-p-3
+                p-3
 
-rounded
+                text-sm
 
-text-sm
+                bg-white
+                dark:bg-gray-700
 
-hover:bg-green-700">
+                dark:text-white
 
-Register
+                border-gray-300
+                dark:border-gray-600
 
-</button>
+                "
 
+              />
 
+              <p className="text-xs text-gray-400 mt-1">
+                Used for login and transaction alerts
+              </p>
 
-<p className="
-text-sm
-text-center
-mt-4">
+            </div>
 
-Already have account?
 
-<Link
 
-to="/"
+            {/* PASSWORD */}
 
-className="
-text-blue-600
-ml-1
-font-medium">
+            <div>
 
-Login
+              <label className="text-sm font-medium">
 
-</Link>
+                Login Password
 
-</p>
+              </label>
 
 
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create secure password"
+                required
+                minLength={6}
 
-</form>
+                className="
 
+                w-full
 
-</div>
+                mt-1
 
-</div>
+                border
 
+                rounded
 
+                p-3
 
+                text-sm
 
-{/* FOOTER */}
-<div className="
-bg-blue-900
-text-white
+                bg-white
+                dark:bg-gray-700
 
-text-center
+                dark:text-white
 
-p-3
+                border-gray-300
+                dark:border-gray-600
 
-text-xs">
+                "
 
-© 2026 Bank Transaction System
+              />
 
-</div>
+              <p className="text-xs text-gray-400 mt-1">
+                Minimum 6 characters recommended
+              </p>
 
+            </div>
 
-</div>
 
-);
+
+            <button
+              type="submit"
+
+              className="
+
+              w-full
+
+              bg-green-600
+
+              text-white
+
+              p-3
+
+              rounded
+
+              text-sm
+
+              hover:bg-green-700
+
+              "
+
+            >
+
+              Open Bank Account
+
+            </button>
+
+
+
+            <p className="text-sm text-center mt-4">
+
+              Already registered?
+
+              <Link
+                to="/"
+
+                className="
+
+                text-blue-600
+
+                dark:text-blue-400
+
+                ml-1
+
+                font-medium
+
+                "
+
+              >
+
+                Secure Login
+
+              </Link>
+
+            </p>
+
+
+            <p className="text-xs text-center text-gray-400 mt-2">
+
+              By continuing, you agree to bank terms & privacy policy
+
+            </p>
+
+
+          </form>
+
+
+        </div>
+
+      </div>
+
+
+
+      {/* FOOTER */}
+
+      <div
+
+        className="
+
+        bg-blue-900
+        dark:bg-gray-800
+
+        text-white
+
+        text-center
+
+        p-3
+
+        text-xs
+
+        "
+
+      >
+
+        © 2026 Secure Bank System | Trusted Digital Banking
+
+      </div>
+
+
+    </div>
+
+  );
 
 };
 

@@ -45,8 +45,6 @@ const Login = () => {
     }
     catch (error) {
 
-      console.log(error);
-
       alert("Invalid credentials");
 
     }
@@ -57,19 +55,73 @@ const Login = () => {
 
   return (
 
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div
+
+      className="
+
+      min-h-screen
+
+      flex
+      flex-col
+
+      bg-gray-50
+      dark:bg-gray-900
+
+      text-gray-900
+      dark:text-gray-100
+
+      "
+
+    >
 
 
       {/* HEADER */}
-      <div className="bg-blue-900 text-white">
+
+      <div
+
+        className="
+
+        bg-blue-900
+        dark:bg-gray-800
+
+        text-white
+
+        "
+
+      >
 
         <div className="flex flex-col items-center text-center py-6 md:py-10">
 
           <div className="flex items-center gap-3 md:gap-5">
 
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-white/20 rounded flex items-center justify-center text-sm md:text-lg font-bold">
+            <div
 
-              LOGO
+              className="
+
+              w-12
+              h-12
+
+              md:w-16
+              md:h-16
+
+              bg-white/20
+
+              rounded
+
+              flex
+              items-center
+              justify-center
+
+              text-sm
+              md:text-lg
+
+              font-bold
+
+              "
+
+            >
+
+              🏦
 
             </div>
 
@@ -78,17 +130,16 @@ const Login = () => {
 
               <h1 className="text-lg md:text-2xl font-bold">
 
-                Bank Transaction System
+                Secure Bank Portal
 
               </h1>
 
 
               <p className="text-xs md:text-sm opacity-80">
 
-                Your trusted banking partner
+                Safe • Fast • Reliable Transactions
 
               </p>
-
 
             </div>
 
@@ -105,15 +156,46 @@ const Login = () => {
 
 
       {/* LOGIN CARD */}
+
       <div className="flex-1 flex items-center justify-center p-4 md:p-8">
 
-        <div className="bg-white shadow rounded p-6 md:p-10 w-full max-w-md">
+        <div
 
-          <h2 className="text-xl md:text-2xl font-semibold mb-6 text-center">
+          className="
 
-            Sign in to your account
+          bg-white
+          dark:bg-gray-800
 
-          </h2>
+          shadow
+          dark:shadow-lg
+
+          rounded
+
+          p-6
+          md:p-10
+
+          w-full
+          max-w-md
+
+          "
+
+        >
+
+          <div className="text-center mb-6">
+
+            <h2 className="text-xl md:text-2xl font-semibold">
+
+              Login to Internet Banking
+
+            </h2>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+
+              🔒 Your session is encrypted and secure
+
+            </p>
+
+          </div>
 
 
 
@@ -124,11 +206,12 @@ const Login = () => {
 
 
             {/* EMAIL */}
+
             <div>
 
               <label className="text-sm font-medium">
 
-                Email
+                Customer ID / Email
 
               </label>
 
@@ -138,7 +221,33 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="w-full mt-1 border rounded p-3 text-sm"
+
+                placeholder="Enter registered email"
+
+                className="
+
+                w-full
+
+                mt-1
+
+                border
+
+                rounded
+
+                p-3
+
+                text-sm
+
+                bg-white
+                dark:bg-gray-700
+
+                dark:text-white
+
+                border-gray-300
+                dark:border-gray-600
+
+                "
+
               />
 
             </div>
@@ -146,6 +255,7 @@ const Login = () => {
 
 
             {/* PASSWORD */}
+
             <div>
 
               <label className="text-sm font-medium">
@@ -161,7 +271,33 @@ const Login = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full mt-1 border rounded p-3 text-sm"
+
+                placeholder="Enter password"
+
+                className="
+
+                w-full
+
+                mt-1
+
+                border
+
+                rounded
+
+                p-3
+
+                text-sm
+
+                bg-white
+                dark:bg-gray-700
+
+                dark:text-white
+
+                border-gray-300
+                dark:border-gray-600
+
+                "
+
               />
 
             </div>
@@ -170,10 +306,28 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white p-3 rounded text-sm hover:bg-blue-700"
+
+              className="
+
+              w-full
+
+              bg-blue-600
+
+              text-white
+
+              p-3
+
+              rounded
+
+              text-sm
+
+              hover:bg-blue-700
+
+              "
+
             >
 
-              Sign in
+              Secure Login
 
             </button>
 
@@ -185,15 +339,33 @@ const Login = () => {
 
               <Link
                 to="/register"
-                className="text-blue-600 ml-1 font-medium"
+
+                className="
+
+                text-blue-600
+
+                dark:text-blue-400
+
+                ml-1
+
+                font-medium
+
+                "
+
               >
 
-                Create account
+                Register for Net Banking
 
               </Link>
 
             </p>
 
+
+            <p className="text-xs text-center text-gray-400 mt-3">
+
+              Never share your password or OTP with anyone
+
+            </p>
 
           </form>
 
@@ -204,9 +376,27 @@ const Login = () => {
 
 
       {/* FOOTER */}
-      <div className="bg-blue-900 text-white text-center p-3 text-xs">
 
-        © 2026 Bank Transaction System
+      <div
+
+        className="
+
+        bg-blue-900
+        dark:bg-gray-800
+
+        text-white
+
+        text-center
+
+        p-3
+
+        text-xs
+
+        "
+
+      >
+
+        © 2026 Secure Bank System | RBI Guidelines Followed
 
       </div>
 

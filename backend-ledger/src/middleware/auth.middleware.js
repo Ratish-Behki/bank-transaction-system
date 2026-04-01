@@ -42,50 +42,93 @@ async function authMiddleware (req, res, next) {
     }
 };
 
-async function authSystemUserMiddleware (req, res, next) {
+async function authSystemUserMiddleware(req, res, next) {
+
     try {
-        
-        const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+
+        const token =
+        req.cookies.token ||
+        req.headers.authorization?.split(" ")[1];
 
         if (!token) {
+
             return res.status(401).json({
-                success: false,
-                message: 'Access denied. No token provided.'
+
+                success:false,
+                message:'Access denied. No token provided.'
+
             });
+
         }
 
-        const isBlacklisted = await tokenBlackListModel.findOne({ token })
+        const isBlacklisted =
+        await tokenBlackListModel.findOne({ token });
 
         if (isBlacklisted) {
+
             return res.status(401).json({
-                message: "Unauthorized access, token is invalid"
-            })
+
+                success:false,
+                message:"Token expired, login again"
+
+            });
+
         }
 
-        // Verify the token
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        // verify token
+        const decoded =
+        jwt.verify(token, process.env.JWT_SECRET);
 
-        const user = await UserModel.findById(decoded.userId).select("+systemUser")
+        // get user from database
+        const user =
+        await UserModel
+        .findById(decoded.userId)
+        .select("+systemUser");
 
-        if(!user.systemUser){
+        // check user exists
+        if (!user) {
+
+            return res.status(401).json({
+
+                success:false,
+                message:"User not found"
+
+            });
+
+        }
+
+        // check systemUser role from DB
+        if (!user.systemUser) {
+
             return res.status(403).json({
-                message:"not a system user"
-            })
+
+                success:false,
+                message:"Only system user (bank) allowed"
+
+            });
+
         }
 
-        req.user = user
+        // attach user to request
+        req.user = user;
 
-        return next();
+        next();
 
-    } 
+    }
+
     catch (error) {
-        console.error('JWT verification error:', error);
+
+        console.error(error);
 
         return res.status(401).json({
-            success: false,
-            message: 'Invalid token.'
+
+            success:false,
+            message:'Invalid or expired token'
+
         });
+
     }
-};
+
+}
 
 module.exports = {authMiddleware,authSystemUserMiddleware};

@@ -20,9 +20,13 @@ app.use(cookieParser());
 const authRouter = require('./routes/auth.routes');
 const accountRouter = require('./routes/account.routes');
 const transactionRouter = require('./routes/transaction.routes')
+const settingsRouter = require('./routes/settings.routes');   
+const requestRouter = require('./routes/request.routes')
 
 app.use('/api/auth', authRouter);
 app.use('/api/accounts', accountRouter);
 app.use('/api/transaction',transactionRouter) // for unique idempotency key we use uuid in postman
+app.use('/api/settings', settingsRouter);
+app.use('/api/request',requestRouter)
 
 module.exports = app;

@@ -2,6 +2,9 @@ const transactionModel = require('../models/transaction.model')
 const ledgerModel = require('../models/ledger.model')
 const emailServices = require('../services/email.service')
 const AccountModel = require('../models/account.model')
+
+const checkFraud = require("../services/fraudService");
+const userModel = require('../models/user.model')
 const mongoose = require('mongoose')
 /**
  * steps:
@@ -126,7 +129,7 @@ async function createTransaction(req,res){
         }],{session})
 
         await (() => {
-            return new Promise((resolve) => setTimeout(resolve, 10 * 1000));
+            return new Promise((resolve) => setTimeout(resolve, 2 * 10));
         })()
 
         const creditLedgerEntry = await ledgerModel.create([{
@@ -154,15 +157,52 @@ async function createTransaction(req,res){
 
     }
     
-    /**
-     * Send email notification
+      /**
+     * SEND EMAIL TO BOTH USERS
      */
 
-    await emailServices.sendTransactionEmail(req.user.email, req.user.name, amount, fromAccount, toAccount)
+
+    const receiverAccount = await AccountModel.findById(toAccount)
+
+
+    const receiverUser = await userModel.findById(
+
+        receiverAccount.user
+
+    )
+
+
+
+    await emailServices.sendTransactionEmail({
+
+        senderEmail: req.user.email,
+
+        senderName: req.user.name,
+
+        receiverEmail: receiverUser.email,
+
+        receiverName: receiverUser.name,
+
+        amount,
+
+        fromAccount,
+
+        toAccount,
+
+        transactionId: transaction._id
+
+        })
+
+
+
     return res.status(201).json({
+
         message:"transaction completed successfully",
-        transaction:transaction
+
+        transaction
+
     })
+
 }
 
 async function createInitialFundsTransaction(req,res){
@@ -290,4 +330,69 @@ const getTransactions = async (req, res) => {
  res.status(200).json(transactions);
 
 };
-module.exports ={createTransaction,createInitialFundsTransaction,getTransactions};
+
+async function transferMoney(req,res){
+
+ const {fromAccount,toAccount,amount} = req.body;
+
+ // 1. check balance
+ const sender = await AccountModel.findById(fromAccount);
+
+ if(sender.balance < amount){
+
+  return res.status(400).json({
+
+   message:"Insufficient balance"
+
+  });
+
+ }
+
+ // 2. fraud detection call
+ const fraudResult = await checkFraud({
+
+  amount,
+  location:req.ip,
+  device:req.headers["user-agent"],
+  time:new Date()
+
+ });
+
+ console.log("fraud response",fraudResult);
+
+ // 3. block suspicious transaction
+ if(fraudResult.reward === 0){
+
+  return res.status(403).json({
+
+   message:"Suspicious transaction blocked"
+
+  });
+
+ }
+
+ // 4. safe DB transaction
+ const session = await mongoose.startSession();
+
+ await session.withTransaction(async()=>{
+
+  sender.balance -= amount;
+
+  const receiver = await AccountModel.findById(toAccount);
+
+  receiver.balance += amount;
+
+  await sender.save({session});
+  await receiver.save({session});
+
+ });
+
+ res.json({
+
+  message:"Transaction successful"
+
+ });
+
+}
+
+module.exports ={createTransaction,createInitialFundsTransaction,getTransactions,transferMoney};
