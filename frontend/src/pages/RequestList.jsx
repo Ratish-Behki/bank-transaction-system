@@ -243,7 +243,8 @@ const RequestList = () => {
 
             :
 
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[700px]">
 
               <thead>
 
@@ -356,6 +357,7 @@ const RequestList = () => {
               </tbody>
 
             </table>
+            </div>
 
           }
 
