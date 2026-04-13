@@ -170,6 +170,8 @@ async function createTransaction(req,res){
         receiverAccount.user
     )
 
+    // Disabled to prevent hanging on Render Free Tier SMTP blocks
+    /*
     emailServices.sendTransactionEmail({
         senderEmail: req.user.email,
         senderName: req.user.name,
@@ -186,8 +188,7 @@ async function createTransaction(req,res){
         transactionId: transaction._id
 
         })
-
-
+    */
 
     return res.status(201).json({
 

@@ -55,13 +55,15 @@ async function userRegisterController(req, res) {
             sameSite: "lax"
         });
 
-        // Send welcome email (don't wait for it to complete)
+        // Send welcome email (disabled due to Render free tier restrictions)
+        /*
         try {
             emailServices.sendRegistrationEmail(newUser.email, newUser.name);
         } catch (emailError) {
             console.error('Failed to send registration email:', emailError);
             // Don't fail registration if email fails
         }
+        */
 
         // Send response
         res.status(201).json({

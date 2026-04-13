@@ -14,6 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Verify the connection configuration
+/* 
 transporter.verify((error, success) => {
   if (error) {
     console.error('Error connecting to email server:', error);
@@ -21,6 +22,7 @@ transporter.verify((error, success) => {
     console.log('Email server is ready to send messages');
   }
 });
+*/
 
 module.exports = transporter;
 
