@@ -39,8 +39,7 @@ const Register = () => {
         formData
       );
 
-
-      await API.post(
+      const loginRes = await API.post(
         "/auth/login",
         {
           email: formData.email,
@@ -49,6 +48,10 @@ const Register = () => {
         { withCredentials: true }
       );
 
+      // Store the token immediately so the subsequent /accounts request is authenticated
+      if (loginRes.data?.data?.token) {
+        localStorage.setItem("token", loginRes.data.data.token);
+      }
 
       await API.post(
         "/accounts",
