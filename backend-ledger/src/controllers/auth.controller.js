@@ -57,7 +57,7 @@ async function userRegisterController(req, res) {
 
         // Send welcome email (don't wait for it to complete)
         try {
-            await emailServices.sendRegistrationEmail(newUser.email, newUser.name);
+            emailServices.sendRegistrationEmail(newUser.email, newUser.name);
         } catch (emailError) {
             console.error('Failed to send registration email:', emailError);
             // Don't fail registration if email fails

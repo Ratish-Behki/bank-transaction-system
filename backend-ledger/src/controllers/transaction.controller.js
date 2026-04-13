@@ -168,17 +168,11 @@ async function createTransaction(req,res){
     const receiverUser = await userModel.findById(
 
         receiverAccount.user
-
     )
 
-
-
-    await emailServices.sendTransactionEmail({
-
+    emailServices.sendTransactionEmail({
         senderEmail: req.user.email,
-
         senderName: req.user.name,
-
         receiverEmail: receiverUser.email,
 
         receiverName: receiverUser.name,
