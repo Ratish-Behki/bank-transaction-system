@@ -34,21 +34,15 @@ const Register = () => {
 
     try {
 
-      await API.post(
+      const registerResponse = await API.post(
         "/auth/register",
         formData
       );
 
-
-      await API.post(
-        "/auth/login",
-        {
-          email: formData.email,
-          password: formData.password
-        },
-        { withCredentials: true }
-      );
-
+      // Store the token from register response
+      if (registerResponse.data?.data?.token) {
+        localStorage.setItem("token", registerResponse.data.data.token);
+      }
 
       await API.post(
         "/accounts",
@@ -58,7 +52,6 @@ const Register = () => {
         },
         { withCredentials: true }
       );
-
 
       toast.success("Bank account created successfully 🎉");
 
